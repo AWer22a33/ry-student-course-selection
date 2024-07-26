@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.ScMapper">
+    
+    <resultMap type="Sc" id="ScResult">
+        <result property="scId"    column="sc_id"    />
+        <result property="stuId"    column="stu_id"    />
+        <result property="cId"    column="c_id"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="deleteBy"    column="delete_by"    />
+        <result property="deleteTime"    column="delete_time"    />
+        <result property="delFlag"    column="del_flag"    />
+    </resultMap>
+
+    <sql id="selectScVo">
+        select sc_id, sc.stu_id, sc.c_id, sc.create_by, sc.create_time, sc.update_by, sc.update_time, sc.delete_by, sc.delete_time, sc.del_flag from sc INNER JOIN student on sc.stu_id = student.stu_id INNER JOIN course on sc.c_id = course.c_id
+    </sql>
+
+    <select id="selectScList" parameterType="Sc" resultMap="ScResult">
+        <include refid="selectScVo"/>
+        <where>
+            sc.del_flag = 0 and student.del_flag = 0 and course.del_flag = 0
+            <if test="stuId != null "> and sc.stu_id = #{stuId}</if>
+            <if test="cId != null "> and sc.c_id = #{cId}</if>
+            <if test="deleteBy != null  and deleteBy != ''"> and sc.delete_by = #{deleteBy}</if>
+            <if test="deleteTime != null "> and sc.delete_time = #{deleteTime}</if>
+            <if test="delFlag != null "> and sc.del_flag = #{delFlag}</if>
+        </where>
+    </select>
+    
+    <select id="selectScByScId" parameterType="Long" resultMap="ScResult">
+        <include refid="selectScVo"/>
+        where sc_id = #{scId} and sc.del_flag = 0 and student.del_flag = 0 and course.del_flag = 0
+    </select>
+
+    <insert id="insertSc" parameterType="Sc" useGeneratedKeys="true" keyProperty="scId">
+        insert into sc
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="stuId != null">stu_id,</if>
+            <if test="cId != null">c_id,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="deleteBy != null">delete_by,</if>
+            <if test="deleteTime != null">delete_time,</if>
+            <if test="delFlag != null">del_flag,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="stuId != null">#{stuId},</if>
+            <if test="cId != null">#{cId},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="deleteBy != null">#{deleteBy},</if>
+            <if test="deleteTime != null">#{deleteTime},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+         </trim>
+    </insert>
+
+    <update id="updateSc" parameterType="Sc">
+        update sc
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="stuId != null">stu_id = #{stuId},</if>
+            <if test="cId != null">c_id = #{cId},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="deleteBy != null">delete_by = #{deleteBy},</if>
+            <if test="deleteTime != null">delete_time = #{deleteTime},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+        </trim>
+        where sc_id = #{scId}
+    </update>
+
+    <delete id="deleteScByScId" parameterType="Long">
+        delete from sc where sc_id = #{scId}
+    </delete>
+
+    <delete id="deleteScByScIds" parameterType="String">
+        delete from sc where sc_id in 
+        <foreach item="scId" collection="array" open="(" separator="," close=")">
+            #{scId}
+        </foreach>
+    </delete>
+
+</mapper>

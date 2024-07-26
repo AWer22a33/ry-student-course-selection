@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.RcMapper">
+
+    <resultMap type="Rc" id="RcResult">
+        <result property="rcId"    column="rc_id"    />
+        <result property="rId"    column="r_id"    />
+        <result property="cId"    column="c_id"    />
+        <result property="weekday"    column="weekday"    />
+        <result property="lessonNumber"    column="lesson_number"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="deleteBy"    column="delete_by"    />
+        <result property="deleteTime"    column="delete_time"    />
+        <result property="delFlag"    column="del_flag"    />
+    </resultMap>
+
+    <sql id="selectRcVo">
+        select rc_id, rc.r_id, rc.c_id, weekday, lesson_number, rc.create_by, rc.create_time, rc.update_by, rc.update_time, rc.delete_by, rc.delete_time, rc.del_flag from rc INNER JOIN course on rc.c_id = course.c_id INNER JOIN room on rc.r_id = room.r_id
+    </sql>
+
+    <select id="selectRcList" parameterType="Rc" resultMap="RcResult">
+        <include refid="selectRcVo"/>
+        <where>
+            rc.del_flag = 0 and course.del_flag = 0 and room.del_flag = 0
+            <if test="rId != null "> and rc.r_id = #{rId}</if>
+            <if test="cId != null "> and rc.c_id = #{cId}</if>
+            <if test="weekday != null  and weekday != ''"> and weekday = #{weekday}</if>
+            <if test="lessonNumber != null  and lessonNumber != ''"> and lesson_number like concat('%', #{lessonNumber}, '%')</if>
+            <if test="deleteBy != null  and deleteBy != ''"> and rc.delete_by = #{deleteBy}</if>
+            <if test="deleteTime != null "> and rc.delete_time = #{deleteTime}</if>
+            <if test="delFlag != null "> and rc.del_flag = #{delFlag}</if>
+        </where>
+    </select>
+
+    <select id="selectRcByRcId" parameterType="Long" resultMap="RcResult">
+        <include refid="selectRcVo"/>
+        where rc_id = #{rcId} and rc.del_flag = 0 and course.del_flag = 0 and room.del_flag = 0
+    </select>
+
+    <insert id="insertRc" parameterType="Rc" useGeneratedKeys="true" keyProperty="rcId">
+        insert into rc
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="rId != null">r_id,</if>
+            <if test="cId != null">c_id,</if>
+            <if test="weekday != null">weekday,</if>
+            <if test="lessonNumber != null">lesson_number,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="deleteBy != null">delete_by,</if>
+            <if test="deleteTime != null">delete_time,</if>
+            <if test="delFlag != null">del_flag,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="rId != null">#{rId},</if>
+            <if test="cId != null">#{cId},</if>
+            <if test="weekday != null">#{weekday},</if>
+            <if test="lessonNumber != null">#{lessonNumber},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="deleteBy != null">#{deleteBy},</if>
+            <if test="deleteTime != null">#{deleteTime},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+        </trim>
+    </insert>
+
+    <update id="updateRc" parameterType="Rc">
+        update rc
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="rId != null">r_id = #{rId},</if>
+            <if test="cId != null">c_id = #{cId},</if>
+            <if test="weekday != null">weekday = #{weekday},</if>
+            <if test="lessonNumber != null">lesson_number = #{lessonNumber},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="deleteBy != null">delete_by = #{deleteBy},</if>
+            <if test="deleteTime != null">delete_time = #{deleteTime},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+        </trim>
+        where rc_id = #{rcId}
+    </update>
+
+    <delete id="deleteRcByRcId" parameterType="Long">
+        delete from rc where rc_id = #{rcId}
+    </delete>
+
+    <delete id="deleteRcByRcIds" parameterType="String">
+        delete from rc where rc_id in
+        <foreach item="rcId" collection="array" open="(" separator="," close=")">
+            #{rcId}
+        </foreach>
+    </delete>
+
+</mapper>

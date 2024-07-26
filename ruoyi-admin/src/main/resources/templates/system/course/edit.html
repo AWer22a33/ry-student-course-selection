@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <th:block th:include="include :: header('修改课程信息')" />
+    <th:block th:include="include :: datetimepicker-css" />
+</head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-course-edit" th:object="${course}">
+            <input name="cId" th:field="*{cId}" type="hidden">
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">课程名称：</label>
+                    <div class="col-sm-8">
+                        <input name="cName" th:field="*{cName}" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <!--<div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">专业号：</label>
+                    <div class="col-sm-8">
+                        <input name="majorId" th:field="*{majorId}" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>-->
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">专业名称：</label>
+                    <div class="col-sm-8">
+                        <select name="majorId" th:with="values=${@majorServiceImpl.selectMajorList(null)}">
+                            <option th:each="marjor : ${values}" th:text="${marjor.majorName}" th:value="${marjor.majorId}" th:selected="${currentMarjorId}==${marjor.majorId}"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">学期：</label>
+                    <div class="col-sm-8">
+                        <select name="termId" th:with="values=${@termServiceImpl.selectTermList(null)}">
+                            <option th:each="term : ${values}" th:text="${term.termName}" th:value="${term.termId}" th:selected="${currentTermId}==${term.termId}"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+           <!-- <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">学期结束：</label>
+                    <div class="col-sm-8">
+                        <select name="termId" th:with="values=${@termServiceImpl.selectTermList(null)}">
+                            <option th:each="term : ${values}" th:text="${term.termEnd}" th:value="${term.termId}" th:selected="${currentTermId}==${term.termId}"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>-->
+            <!--<div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">删除人：</label>
+                    <div class="col-sm-8">
+                        <input name="deleteBy" th:field="*{deleteBy}" class="form-control" type="text">
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">删除时间：</label>
+                    <div class="col-sm-8">
+                        <div class="input-group date">
+                            <input name="deleteTime" th:value="${#dates.format(course.deleteTime, 'yyyy-MM-dd')}" class="form-control" placeholder="yyyy-MM-dd" type="text">
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
+        </form>
+    </div>
+    <th:block th:include="include :: footer" />
+    <th:block th:include="include :: datetimepicker-js" />
+    <script th:inline="javascript">
+        var prefix = ctx + "system/course";
+        $("#form-course-edit").validate({
+            focusCleanup: true
+        });
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                $.operate.save(prefix + "/edit", $('#form-course-edit').serialize());
+            }
+        }
+
+        $("input[name='deleteTime']").datetimepicker({
+            format: "yyyy-mm-dd",
+            minView: "month",
+            autoclose: true
+        });
+    </script>
+</body>
+</html>

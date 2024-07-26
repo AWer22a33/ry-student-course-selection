@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.RoomMapper">
+    
+    <resultMap type="Room" id="RoomResult">
+        <result property="rId"    column="r_id"    />
+        <result property="rName"    column="r_name"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="deleteBy"    column="delete_by"    />
+        <result property="deleteTime"    column="delete_time"    />
+        <result property="delFlag"    column="del_flag"    />
+    </resultMap>
+
+    <sql id="selectRoomVo">
+        select r_id, r_name, create_by, create_time, update_by, update_time, delete_by, delete_time, del_flag from room
+    </sql>
+
+    <select id="selectRoomList" parameterType="Room" resultMap="RoomResult">
+        <include refid="selectRoomVo"/>
+        <where>
+            del_flag = 0
+            <if test="rName != null  and rName != ''"> and r_name like concat('%', #{rName}, '%')</if>
+            <if test="deleteBy != null  and deleteBy != ''"> and delete_by = #{deleteBy}</if>
+            <if test="deleteTime != null "> and delete_time = #{deleteTime}</if>
+            <if test="delFlag != null "> and del_flag = #{delFlag}</if>
+        </where>
+    </select>
+    
+    <select id="selectRoomByRId" parameterType="Long" resultMap="RoomResult">
+        <include refid="selectRoomVo"/>
+        where r_id = #{rId} and del_flag = 0
+    </select>
+
+    <insert id="insertRoom" parameterType="Room" useGeneratedKeys="true" keyProperty="rId">
+        insert into room
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="rName != null">r_name,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="deleteBy != null">delete_by,</if>
+            <if test="deleteTime != null">delete_time,</if>
+            <if test="delFlag != null">del_flag,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="rName != null">#{rName},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="deleteBy != null">#{deleteBy},</if>
+            <if test="deleteTime != null">#{deleteTime},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+         </trim>
+    </insert>
+
+    <update id="updateRoom" parameterType="Room">
+        update room
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="rName != null">r_name = #{rName},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="deleteBy != null">delete_by = #{deleteBy},</if>
+            <if test="deleteTime != null">delete_time = #{deleteTime},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+        </trim>
+        where r_id = #{rId}
+    </update>
+
+    <delete id="deleteRoomByRId" parameterType="Long">
+        delete from room where r_id = #{rId}
+    </delete>
+
+    <delete id="deleteRoomByRIds" parameterType="String">
+        delete from room where r_id in 
+        <foreach item="rId" collection="array" open="(" separator="," close=")">
+            #{rId}
+        </foreach>
+    </delete>
+
+</mapper>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('教室课程信息列表')" />
+</head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="formId">
+                <div class="select-list">
+                    <ul>
+                        <!--<li>
+                            <label>教室号：</label>
+                            <input type="text" name="rId"/>
+                        </li>-->
+                        <li>
+                        <label>教室名称：</label>
+                        <div class="col-sm-8">
+                            <select name="rId" th:with="values=${@roomServiceImpl.selectRoomList(null)}">
+                                <option value="" selected>全部教室</option>
+                                <option th:each="room : ${values}" th:text="${room.rName}" th:value="${room.rId}"></option>
+                            </select>
+                        </div>
+                        </li>
+
+                       <!-- <li>
+                            <label>课程编号：</label>
+                            <input type="text" name="cId"/>
+                        </li>-->
+
+                        <li>
+                            <label>课程名称：</label>
+                            <div class="col-sm-8">
+                                <select name="cId" th:with="values=${@courseServiceImpl.selectCourseList(null)}">
+                                    <option value="" selected>全部课程</option>
+                                    <option th:each="course : ${values}" th:text="${course.cName}" th:value="${course.cId}"></option>
+                                </select>
+                            </div>
+                        </li>
+
+                        <li>
+                            <label>星期：</label>
+                            <div class="col-sm-8">
+                                <select name="weekday" class="form-control m-b">
+                                    <option value="" selected>任何星期</option>
+                                    <option value="星期一">星期一</option>
+                                    <option value="星期二">星期二</option>
+                                    <option value="星期三">星期三</option>
+                                    <option value="星期四">星期四</option>
+                                    <option value="星期五">星期五</option>
+                                    <option value="星期六">星期六</option>
+                                    <option value="星期日">星期日</option>
+                                </select>
+                            </div>
+                        </li>
+                        <li>
+                            <label>上课节次：</label>
+                            <div class="col-sm-8">
+                                <select name="lessonNumber" class="form-control m-b">
+                                    <option value="" selected>任何节次</option>
+                                    <option value="1">第一大节</option>
+                                    <option value="2">第二大节</option>
+                                    <option value="3">第三大节</option>
+                                    <option value="4">第四大节</option>
+                                    <option value="5">第五大节</option>
+                                </select>
+                            </div>
+                        </li>
+                       <!-- <li>
+                            <label>删除人：</label>
+                            <input type="text" name="deleteBy"/>
+                        </li>
+                        <li>
+                            <label>删除时间：</label>
+                            <input type="text" class="time-input" placeholder="请选择删除时间" name="deleteTime"/>
+                        </li>-->
+                        <li>
+                            <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                            <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="btn-group-sm" id="toolbar" role="group">
+            <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:rc:add">
+                <i class="fa fa-plus"></i> 添加
+            </a>
+            <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="system:rc:edit">
+                <i class="fa fa-edit"></i> 修改
+            </a>
+            <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:rc:remove">
+                <i class="fa fa-remove"></i> 删除
+            </a>
+            <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:rc:export">
+                <i class="fa fa-download"></i> 导出
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+<th:block th:include="include :: footer" />
+<script th:inline="javascript">
+    var editFlag = [[${@permission.hasPermi('system:rc:edit')}]];
+    var removeFlag = [[${@permission.hasPermi('system:rc:remove')}]];
+    var prefix = ctx + "system/rc";
+    const lessonMap = {
+        '1': '<span class="label label-success">第一大节</span>',
+        '2': '<span class="label label-primary">第二大节</span>',
+        '3': '<span class="label label-primary">第三大节</span>',
+        '4': '<span class="label label-primary">第四大节</span>',
+        '5': '<span class="label label-primary">第五大节</span>'
+    };
+
+    $(function() {
+        var options = {
+            url: prefix + "/list",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            exportUrl: prefix + "/export",
+            modalName: "教室课程信息",
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'rcId',
+                    title: '教室课程编号',
+                    visible: false
+                },
+                /*{
+                    field: 'rId',
+                    title: '教室号'
+                },*/
+                {
+                    field: 'rName',
+                    title: '教室名称'
+                },
+               /* {
+                    field: 'cId',
+                    title: '课程编号'
+                },*/
+                {
+                    field: 'cName',
+                    title: '课程名称'
+                },
+                {
+                    field: 'weekday',
+                    title: '星期'
+                },
+                {
+                    field: 'lessonNumber',
+                    title: '上课节次',
+                    formatter: function(value, item, index) {
+                        let lessonNumbers = item.lessonNumber.split(',');
+                        let formattedLessons = lessonNumbers.map(number => lessonMap[number]).join(' ');
+
+                        return formattedLessons;
+                    }
+                },
+               /* {
+                    field: 'deleteBy',
+                    title: '删除人'
+                },
+                {
+                    field: 'deleteTime',
+                    title: '删除时间'
+                },*/
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.rcId + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.rcId + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        return actions.join('');
+                    }
+                }]
+        };
+        $.table.init(options);
+    });
+</script>
+</body>
+</html>

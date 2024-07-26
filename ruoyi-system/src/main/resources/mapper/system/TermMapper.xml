@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TermMapper">
+
+    <resultMap type="Term" id="TermResult">
+        <result property="termId"    column="term_id"    />
+        <result property="termName"    column="term_name"    />
+    </resultMap>
+
+    <sql id="selectTermVo">
+        select term_id, term_name from term
+    </sql>
+
+    <select id="selectTermList" parameterType="Term" resultMap="TermResult">
+        <include refid="selectTermVo"/>
+        <where>
+            <if test="termName != null  and termName != ''"> and term_name like concat('%', #{termName}, '%')</if>
+        </where>
+    </select>
+
+    <select id="selectTermByTermId" parameterType="Long" resultMap="TermResult">
+        <include refid="selectTermVo"/>
+        where term_id = #{termId}
+    </select>
+
+    <insert id="insertTerm" parameterType="Term" useGeneratedKeys="true" keyProperty="termId">
+        insert into term
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="termName != null">term_name,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="termName != null">#{termName},</if>
+        </trim>
+    </insert>
+
+    <update id="updateTerm" parameterType="Term">
+        update term
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="termName != null">term_name = #{termName},</if>
+        </trim>
+        where term_id = #{termId}
+    </update>
+
+    <delete id="deleteTermByTermId" parameterType="Long">
+        delete from term where term_id = #{termId}
+    </delete>
+
+    <delete id="deleteTermByTermIds" parameterType="String">
+        delete from term where term_id in
+        <foreach item="termId" collection="array" open="(" separator="," close=")">
+            #{termId}
+        </foreach>
+    </delete>
+
+</mapper>

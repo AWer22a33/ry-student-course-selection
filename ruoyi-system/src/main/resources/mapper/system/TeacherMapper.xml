@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TeacherMapper">
+    
+    <resultMap type="Teacher" id="TeacherResult">
+        <result property="tId"    column="t_id"    />
+        <result property="tName"    column="t_name"    />
+        <result property="tAge"    column="t_age"    />
+        <result property="tSex"    column="t_sex"    />
+        <result property="hireDate"    column="hire_date"    />
+        <result property="tTitle"    column="t_title"    />
+        <result property="workExperience"    column="work_experience"    />
+        <result property="party"    column="party"    />
+        <result property="speciality"    column="speciality"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="deleteBy"    column="delete_by"    />
+        <result property="deleteTime"    column="delete_time"    />
+        <result property="delFlag"    column="del_flag"    />
+    </resultMap>
+
+    <sql id="selectTeacherVo">
+        select t_id, t_name, t_age, t_sex, hire_date, t_title, work_experience, party, speciality, create_by, create_time, update_by, update_time, delete_by, delete_time, del_flag from teacher
+    </sql>
+
+    <select id="selectTeacherList" parameterType="Teacher" resultMap="TeacherResult">
+        <include refid="selectTeacherVo"/>
+        <where>
+            del_flag = 0
+            <if test="tName != null  and tName != ''"> and t_name like concat('%', #{tName}, '%')</if>
+            <if test="tAge != null "> and t_age = #{tAge}</if>
+            <if test="tSex != null "> and t_sex = #{tSex}</if>
+            <if test="hireDate != null "> and hire_date = #{hireDate}</if>
+            <if test="tTitle != null  and tTitle != ''"> and t_title = #{tTitle}</if>
+            <if test="workExperience != null  and workExperience != ''"> and work_experience = #{workExperience}</if>
+            <if test="party != null "> and party = #{party}</if>
+            <if test="speciality != null  and speciality != ''"> and speciality like concat('%', #{speciality}, '%')</if>
+            <if test="deleteBy != null  and deleteBy != ''"> and delete_by = #{deleteBy}</if>
+            <if test="deleteTime != null "> and delete_time = #{deleteTime}</if>
+            <if test="delFlag != null "> and del_flag = #{delFlag}</if>
+        </where>
+    </select>
+    
+    <select id="selectTeacherByTId" parameterType="Long" resultMap="TeacherResult">
+        <include refid="selectTeacherVo"/>
+        where t_id = #{tId} and del_flag = 0
+    </select>
+
+    <select id="getMaxMinTeacherAgeGroupByMajor" resultType="com.ruoyi.system.vo.TeacherMaxMinAgeVo">
+        SELECT
+            major.major_name AS majorName,
+            max( t_age ) AS totalMax,
+            min( t_age ) AS totalMin
+        FROM
+            teacher
+                JOIN tc ON teacher.t_id = tc.t_id
+                JOIN course ON course.c_id = tc.c_id
+                JOIN major ON major.major_id = course.major_id
+        WHERE
+            major.del_flag = 0
+          AND tc.del_flag = 0
+          AND course.del_flag = 0
+          AND teacher.del_flag = 0
+        GROUP BY
+            major_name;
+    </select>
+
+    <insert id="insertTeacher" parameterType="Teacher" useGeneratedKeys="true" keyProperty="tId">
+        insert into teacher
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tName != null">t_name,</if>
+            <if test="tAge != null">t_age,</if>
+            <if test="tSex != null">t_sex,</if>
+            <if test="hireDate != null">hire_date,</if>
+            <if test="tTitle != null">t_title,</if>
+            <if test="workExperience != null">work_experience,</if>
+            <if test="party != null">party,</if>
+            <if test="speciality != null">speciality,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="deleteBy != null">delete_by,</if>
+            <if test="deleteTime != null">delete_time,</if>
+            <if test="delFlag != null">del_flag,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tName != null">#{tName},</if>
+            <if test="tAge != null">#{tAge},</if>
+            <if test="tSex != null">#{tSex},</if>
+            <if test="hireDate != null">#{hireDate},</if>
+            <if test="tTitle != null">#{tTitle},</if>
+            <if test="workExperience != null">#{workExperience},</if>
+            <if test="party != null">#{party},</if>
+            <if test="speciality != null">#{speciality},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="deleteBy != null">#{deleteBy},</if>
+            <if test="deleteTime != null">#{deleteTime},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTeacher" parameterType="Teacher">
+        update teacher
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tName != null">t_name = #{tName},</if>
+            <if test="tAge != null">t_age = #{tAge},</if>
+            <if test="tSex != null">t_sex = #{tSex},</if>
+            <if test="hireDate != null">hire_date = #{hireDate},</if>
+            <if test="tTitle != null">t_title = #{tTitle},</if>
+            <if test="workExperience != null">work_experience = #{workExperience},</if>
+            <if test="party != null">party = #{party},</if>
+            <if test="speciality != null">speciality = #{speciality},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="deleteBy != null">delete_by = #{deleteBy},</if>
+            <if test="deleteTime != null">delete_time = #{deleteTime},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+        </trim>
+        where t_id = #{tId}
+    </update>
+
+    <delete id="deleteTeacherByTId" parameterType="Long">
+        delete from teacher where t_id = #{tId}
+    </delete>
+
+    <delete id="deleteTeacherByTIds" parameterType="String">
+        delete from teacher where t_id in 
+        <foreach item="tId" collection="array" open="(" separator="," close=")">
+            #{tId}
+        </foreach>
+    </delete>
+
+</mapper>

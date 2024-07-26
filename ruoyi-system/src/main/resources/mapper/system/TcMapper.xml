@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TcMapper">
+    
+    <resultMap type="Tc" id="TcResult">
+        <result property="tcId"    column="tc_id"    />
+        <result property="tId"    column="t_id"    />
+        <result property="cId"    column="c_id"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="deleteBy"    column="delete_by"    />
+        <result property="deleteTime"    column="delete_time"    />
+        <result property="delFlag"    column="del_flag"    />
+    </resultMap>
+
+    <sql id="selectTcVo">
+        select tc_id, tc.t_id, tc.c_id, tc.create_by, tc.create_time, tc.update_by, tc.update_time, tc.delete_by, tc.delete_time, tc.del_flag from tc INNER JOIN teacher ON tc.t_id = teacher.t_id INNER JOIN course ON tc.c_id = course.c_id
+    </sql>
+
+    <select id="selectTcList" parameterType="Tc" resultMap="TcResult">
+        <include refid="selectTcVo"/>
+        <where>
+            tc.del_flag = 0 and teacher.del_flag = 0 and course.del_flag = 0
+            <if test="tId != null "> and tc.t_id = #{tId}</if>
+            <if test="cId != null "> and tc.c_id = #{cId}</if>
+            <if test="deleteBy != null  and deleteBy != ''"> and tc.delete_by = #{deleteBy}</if>
+            <if test="deleteTime != null "> and tc.delete_time = #{deleteTime}</if>
+            <if test="delFlag != null "> and tc.del_flag = #{delFlag}</if>
+        </where>
+    </select>
+    
+    <select id="selectTcByTcId" parameterType="Long" resultMap="TcResult">
+        <include refid="selectTcVo"/>
+        where tc_id = #{tcId} and tc.del_flag = 0 and teacher.del_flag = 0 and course.del_flag = 0
+    </select>
+
+    <insert id="insertTc" parameterType="Tc" useGeneratedKeys="true" keyProperty="tcId">
+        insert into tc
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tId != null">t_id,</if>
+            <if test="cId != null">c_id,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="deleteBy != null">delete_by,</if>
+            <if test="deleteTime != null">delete_time,</if>
+            <if test="delFlag != null">del_flag,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tId != null">#{tId},</if>
+            <if test="cId != null">#{cId},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="deleteBy != null">#{deleteBy},</if>
+            <if test="deleteTime != null">#{deleteTime},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+         </trim>
+    </insert>
+
+    <update id="updateTc" parameterType="Tc">
+        update tc
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tId != null">t_id = #{tId},</if>
+            <if test="cId != null">c_id = #{cId},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="deleteBy != null">delete_by = #{deleteBy},</if>
+            <if test="deleteTime != null">delete_time = #{deleteTime},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+        </trim>
+        where tc_id = #{tcId}
+    </update>
+
+    <delete id="deleteTcByTcId" parameterType="Long">
+        delete from tc where tc_id = #{tcId}
+    </delete>
+
+    <delete id="deleteTcByTcIds" parameterType="String">
+        delete from tc where tc_id in 
+        <foreach item="tcId" collection="array" open="(" separator="," close=")">
+            #{tcId}
+        </foreach>
+    </delete>
+
+</mapper>
